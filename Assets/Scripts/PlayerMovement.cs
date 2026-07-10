@@ -6,6 +6,8 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
 {
     public Rigidbody2D playerRb;
+    public Animator animator;
+    public ParticleSystem dustFX;
 
     // Movement
     public float moveSpeed = 5f;
@@ -57,6 +59,12 @@ public class PlayerMovement : MonoBehaviour
             playerRb.linearVelocity = new Vector2(horizontalMovement * moveSpeed, playerRb.linearVelocity.y);
             Flip();
         }
+
+        // gives animation to our actions
+        animator.SetFloat("yVelocity", playerRb.linearVelocity.y);
+        animator.SetFloat("magnitude", playerRb.linearVelocity.magnitude);
+        animator.SetBool("isWallSliding", isWallSliding);
+
     }
 
     private void Gravity()
@@ -74,12 +82,16 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+   
+
 
     // Movement
     public void Move(InputAction.CallbackContext context)
     {
         // movement left and right
         horizontalMovement = context.ReadValue<Vector2>().x;
+
+
     }
     
     // Jump action
@@ -93,12 +105,19 @@ public class PlayerMovement : MonoBehaviour
             {
                 playerRb.linearVelocity = new Vector2(playerRb.linearVelocity.x, jumpPower);
                 jumpsRemaining--;
+
+                // activates the JumpFX void
+                JumpFX();
             }
             // if jump button is only tapped = half the height
             else if (context.canceled)
             {
                 playerRb.linearVelocity = new Vector2(playerRb.linearVelocity.x, playerRb.linearVelocity.y * 0.5f);
                 jumpsRemaining--;
+
+                // activates the JumpFX void
+                JumpFX();
+
             }
         }
 
@@ -109,6 +128,9 @@ public class PlayerMovement : MonoBehaviour
             // Jump away from the wall
             playerRb.linearVelocity = new Vector2(wallJumpDirection * wallJumpPower.x, wallJumpPower.y);
             wallJumpTimer = 0f;
+
+            // activates the JumpFX void
+            JumpFX();
 
             // Force flip
             if (transform.localScale.x != wallJumpDirection)
@@ -122,6 +144,18 @@ public class PlayerMovement : MonoBehaviour
             Invoke(nameof(CancelWallJump), wallJumpTime + 0.1f);
             // wall jump = 0.5f -- Jump again = 0.6f
         }
+        
+    }
+
+    private void JumpFX()
+    {
+        // Gives jump its animation
+        animator.SetTrigger("jump");
+
+       
+        // plays the dust trail animaton
+        dustFX.Play();
+      
         
     }
 
@@ -187,6 +221,8 @@ public class PlayerMovement : MonoBehaviour
         {
             isGrounded = false;
         }
+
+        
     }
 
     // Define touching wall
@@ -204,6 +240,11 @@ public class PlayerMovement : MonoBehaviour
             Vector3 ls = transform.localScale;
             ls.x *= -1f;
             transform.localScale = ls;
+
+            if (playerRb.linearVelocity.y == 0)
+            {
+                dustFX.Play();
+            }
         }
     }
 
