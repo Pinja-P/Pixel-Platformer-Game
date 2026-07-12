@@ -7,7 +7,13 @@ public class PlayerMovement : MonoBehaviour
 {
     public Rigidbody2D playerRb;
     public Animator animator;
-    public ParticleSystem dustFX;
+
+    //Particles
+    [SerializeField] ParticleSystem fallParticles;
+    [SerializeField] ParticleSystem movementParticles;
+    int occurAfterVelocity = 1;
+    float dustFormationPeriod = 0.08f;
+    float particleTimeCouter;
 
     // Movement
     public float moveSpeed = 5f;
@@ -22,6 +28,7 @@ public class PlayerMovement : MonoBehaviour
     // Wall Movement
     public float wallSlideSpeed = 2f;
     bool isWallSliding;
+    
     // wall jumping
     bool isWallJumping;
     float wallJumpDirection;
@@ -52,6 +59,7 @@ public class PlayerMovement : MonoBehaviour
         WallSlide();
         WallJump();
         Gravity();
+        MoveParticles();
         
         if (!isWallJumping)
         {   
@@ -81,9 +89,6 @@ public class PlayerMovement : MonoBehaviour
             playerRb.gravityScale = baseGravity;
         }
     }
-
-   
-
 
     // Movement
     public void Move(InputAction.CallbackContext context)
@@ -152,11 +157,6 @@ public class PlayerMovement : MonoBehaviour
         // Gives jump its animation
         animator.SetTrigger("jump");
 
-       
-        // plays the dust trail animaton
-        dustFX.Play();
-      
-        
     }
 
     // Wall slide action
@@ -222,7 +222,6 @@ public class PlayerMovement : MonoBehaviour
             isGrounded = false;
         }
 
-        
     }
 
     // Define touching wall
@@ -241,12 +240,27 @@ public class PlayerMovement : MonoBehaviour
             ls.x *= -1f;
             transform.localScale = ls;
 
-            if (playerRb.linearVelocity.y == 0)
+        }
+    }
+
+    // Ads movement particles when moving
+    private void MoveParticles()
+    {
+        particleTimeCouter += Time.deltaTime;
+
+        if (isGrounded && Mathf.Abs(playerRb.linearVelocity.x) > occurAfterVelocity)
+        {
+            if (particleTimeCouter > dustFormationPeriod)
             {
-                dustFX.Play();
+                movementParticles.Play();
+                particleTimeCouter = 0;
             }
         }
     }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        fallParticles.Play();
+    }
 
 }
