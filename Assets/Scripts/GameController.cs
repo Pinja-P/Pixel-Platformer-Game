@@ -28,7 +28,7 @@ public class GameController : MonoBehaviour
         progressAmount += amount;
         progressSlider.value = progressAmount;
 
-        if (progressAmount >= 180)
+        if (progressAmount >= 150)
         {
             //Level complete!
             LoadCanvas.SetActive(true);
