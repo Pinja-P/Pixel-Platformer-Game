@@ -14,6 +14,8 @@ public class GameController : MonoBehaviour
     public List<GameObject> levels;
     private int currentLevelIndex = 0;
 
+    public GameObject LevelDoneCanvas;
+
     void Start()
     {
         progressAmount = 0;
