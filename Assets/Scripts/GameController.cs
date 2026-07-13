@@ -10,11 +10,15 @@ public class GameController : MonoBehaviour
     public Slider progressSlider;
 
     public GameObject player;
+    public GameObject enemy;
     public GameObject LoadCanvas;
     public List<GameObject> levels;
     private int currentLevelIndex = 0;
 
     public GameObject LevelDoneCanvas;
+
+    public ParticleSystem victory;
+    public ParticleSystem victory2;
 
     void Start()
     {
@@ -23,6 +27,7 @@ public class GameController : MonoBehaviour
         Gem.OnGemCollect += IncreaseProgressAmount;
         HoldToLoad.OnHoldComplete += LoadNextLevel;
         LoadCanvas.SetActive(false);
+        LevelDoneCanvas.SetActive(false);
     }
 
     void IncreaseProgressAmount(int amount)
@@ -30,11 +35,15 @@ public class GameController : MonoBehaviour
         progressAmount += amount;
         progressSlider.value = progressAmount;
 
-        if (progressAmount >= 150)
+        if (progressAmount >= 110)
         {
             //Level complete!
             LoadCanvas.SetActive(true);
+            LevelDoneCanvas.SetActive(true);
             Debug.Log("Level Complete");
+
+            victory.Play();
+            victory2.Play();
         }
     }
 
@@ -43,12 +52,15 @@ public class GameController : MonoBehaviour
         // Basically one line if statement. If we're on final level then set level back to 0. Otherwise load next level
         int nextLevelIndex = (currentLevelIndex == levels.Count - 1) ? 0 : currentLevelIndex + 1;
         LoadCanvas.SetActive(false);
+        LevelDoneCanvas.SetActive(false);
 
         // Disables old level and enables new level
         levels[currentLevelIndex].gameObject.SetActive(false);
         levels[nextLevelIndex].gameObject.SetActive(true);
 
         player.transform.position = new Vector3(14, -4, 0);
+        enemy.transform.position = new Vector3(13, -4.8f, 0);
+
 
         currentLevelIndex = nextLevelIndex;
         progressAmount = 0;
