@@ -11432,6 +11432,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameController
   progressSlider: {fileID: 366051940}
   player: {fileID: 721657811}
+  enemy: {fileID: 434022109}
   LoadCanvas: {fileID: 1379254611}
   levels:
   - {fileID: 1549790597}
